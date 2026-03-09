@@ -113,11 +113,7 @@ class StressProgramAssessment {
 
     for (let i = 1; i <= 50; i++) {
       const selected = document.querySelector(`input[name="q${i}"]:checked`);
-      if (!selected) {
-        alert("Please answer all 50 questions before evaluating.");
-        return;
-      }
-      answers[i] = Number(selected.value);
+      answers[i] = selected ? Number(selected.value) : 0;
     }
 
     const scores = {};
