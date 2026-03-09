@@ -128,10 +128,12 @@ class StressProgramAssessment {
       scores[programName] = questionNumbers.reduce((sum, qNum) => sum + answers[qNum], 0);
     }
 
+    // Show the results container first so visual content appears immediately.
+    this.resultsElement.style.display = "block";
+
     this.renderResults(scores);
     this.renderRadarChart(scores);
 
-    this.resultsElement.style.display = "block";
     this.resultsElement.scrollIntoView({ behavior: "smooth" });
   }
 
@@ -144,10 +146,10 @@ class StressProgramAssessment {
       const imageName = this.programVisualAssets[programName] || "";
 
       card.innerHTML = `
-        <div class="result-visual-wrap">
-          <img class="result-visual-image" src="${imageName}" alt="${programName} visual" loading="lazy">
-        </div>
         <h3>${programName}</h3>
+        <div class="result-visual-wrap">
+          <img class="result-visual-image" src="${imageName}" alt="${programName} visual">
+        </div>
         <div class="score">${score} / 50</div>
         <div class="flag">${score > 40 ? "Dominant under stress" : "Below dominant threshold"}</div>
       `;
