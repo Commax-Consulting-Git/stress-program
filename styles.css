@@ -414,12 +414,13 @@ canvas {
     padding-right: 10px;
   }
 
-  .page-header {
+  .page-header-main {
+    flex-direction: column;
     align-items: flex-start;
     gap: 10px;
   }
 
-  .hero-logo {
+  .page-header-main .hero-logo {
     max-height: 46px;
   }
 
@@ -440,6 +441,10 @@ canvas {
     padding: 14px;
   }
 
+  .chart-wrapper {
+    padding: 8px 4px 0;
+  }
+
 }
 
 @media (max-width: 500px) {
@@ -454,6 +459,10 @@ canvas {
 
   .btn-primary {
     width: 100%;
+  }
+
+  .page-header-main .hero-logo {
+    max-height: 42px;
   }
 
 }

@@ -170,6 +170,7 @@ class StressProgramAssessment {
 
   renderRadarChart(scores) {
     const context = this.radarChartCanvas.getContext("2d");
+    const isNarrowViewport = window.innerWidth <= 700;
 
     if (this.radarChartInstance) {
       this.radarChartInstance.destroy();
@@ -195,6 +196,11 @@ class StressProgramAssessment {
       options: {
         responsive: true,
         maintainAspectRatio: true,
+        layout: {
+          padding: isNarrowViewport
+            ? { top: 24, right: 30, bottom: 24, left: 30 }
+            : { top: 14, right: 18, bottom: 14, left: 18 }
+        },
         scales: {
           r: {
             min: 0,
@@ -205,8 +211,9 @@ class StressProgramAssessment {
             },
             pointLabels: {
               font: {
-                size: 13
-              }
+                size: isNarrowViewport ? 11 : 13
+              },
+              padding: isNarrowViewport ? 16 : 12
             },
             grid: {
               circular: false
