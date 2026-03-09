@@ -268,6 +268,34 @@ h1 {
   color: #0f3d3a;
 }
 
+.result-visual-wrap {
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.result-visual-image {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  border-radius: 10px;
+  background: #f1f5f9;
+  border: 1px solid rgba(15, 118, 110, 0.14);
+}
+
+.result-visual-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 10px;
+  border: 1px dashed rgba(15, 118, 110, 0.35);
+  background: #f1f5f9;
+  color: #64748b;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.84rem;
+}
+
 .score {
   font-size: 1.6rem;
   font-weight: 700;
@@ -298,63 +326,6 @@ h1 {
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.09);
 }
 
-.program-visuals {
-  margin-top: 18px;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 12px;
-}
-
-.program-visual-card {
-  margin: 0;
-  border: 1px solid rgba(15, 118, 110, 0.16);
-  border-radius: 14px;
-  background: var(--card-solid);
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-height: 100%;
-}
-
-.program-visual-image {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  object-fit: contain;
-  border-radius: 10px;
-  background: #f1f5f9;
-}
-
-.program-visual-placeholder {
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  border-radius: 10px;
-  border: 1px dashed rgba(15, 118, 110, 0.35);
-  background: #f1f5f9;
-  color: #64748b;
-  display: grid;
-  place-items: center;
-  text-align: center;
-  padding: 10px;
-  font-size: 0.84rem;
-}
-
-.program-visual-caption {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.program-visual-name {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: #0f3d3a;
-}
-
-.program-visual-score {
-  font-size: 0.86rem;
-  color: var(--muted);
-}
 
 .chart-wrapper {
   max-width: min(1200px, 100%);
@@ -469,9 +440,6 @@ canvas {
     padding: 14px;
   }
 
-  .program-visuals {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
 @media (max-width: 500px) {
@@ -488,7 +456,4 @@ canvas {
     width: 100%;
   }
 
-  .program-visuals {
-    grid-template-columns: 1fr;
-  }
 }

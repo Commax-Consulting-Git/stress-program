@@ -71,7 +71,6 @@ class StressProgramAssessment {
     this.questionsContainer = document.getElementById("questions");
     this.resultGrid = document.getElementById("resultGrid");
     this.resultsElement = document.getElementById("results");
-    this.programVisualsElement = document.getElementById("programVisuals");
     this.evaluateButton = document.getElementById("evaluateBtn");
     this.radarChartCanvas = document.getElementById("radarChart");
     this.radarChartInstance = null;
@@ -131,7 +130,6 @@ class StressProgramAssessment {
 
     this.renderResults(scores);
     this.renderRadarChart(scores);
-    this.renderProgramVisuals(scores);
 
     this.resultsElement.style.display = "block";
     this.resultsElement.scrollIntoView({ behavior: "smooth" });
@@ -143,12 +141,26 @@ class StressProgramAssessment {
     Object.entries(scores).forEach(([programName, score]) => {
       const card = document.createElement("div");
       card.className = "result-card" + (score > 40 ? " highlight" : "");
+      const imageName = this.programVisualAssets[programName] || "";
 
       card.innerHTML = `
+        <div class="result-visual-wrap">
+          <img class="result-visual-image" src="${imageName}" alt="${programName} visual" loading="lazy">
+        </div>
         <h3>${programName}</h3>
         <div class="score">${score} / 50</div>
         <div class="flag">${score > 40 ? "Dominant under stress" : "Below dominant threshold"}</div>
       `;
+
+      const image = card.querySelector(".result-visual-image");
+      if (image) {
+        image.addEventListener("error", () => {
+          const placeholder = document.createElement("div");
+          placeholder.className = "result-visual-placeholder";
+          placeholder.textContent = `Missing image: ${imageName}`;
+          image.replaceWith(placeholder);
+        });
+      }
 
       this.resultGrid.appendChild(card);
     });
@@ -213,47 +225,6 @@ class StressProgramAssessment {
     });
   }
 
-  renderProgramVisuals(scores) {
-    if (!this.programVisualsElement) {
-      return;
-    }
-
-    this.programVisualsElement.innerHTML = "";
-
-    Object.entries(scores).forEach(([programName, score]) => {
-      const card = document.createElement("figure");
-      card.className = "program-visual-card";
-
-      const imageName = this.programVisualAssets[programName] || "";
-      const statusText = score > 40 ? "Dominant" : "Observed";
-
-      const image = document.createElement("img");
-      image.className = "program-visual-image";
-      image.src = imageName;
-      image.alt = `${programName} visual`;
-      image.loading = "lazy";
-
-      image.addEventListener("error", () => {
-        image.remove();
-        const placeholder = document.createElement("div");
-        placeholder.className = "program-visual-placeholder";
-        placeholder.textContent = `Missing image: ${imageName}`;
-        card.prepend(placeholder);
-      });
-
-      const caption = document.createElement("figcaption");
-      caption.className = "program-visual-caption";
-      caption.innerHTML = `
-        <span class="program-visual-name">${programName}</span>
-        <span class="program-visual-score">${score} / 50 · ${statusText}</span>
-      `;
-
-      card.appendChild(image);
-      card.appendChild(caption);
-
-      this.programVisualsElement.appendChild(card);
-    });
-  }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
