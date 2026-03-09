@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stress Program Assessment</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 32px 20px 60px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .logo {
+      max-height: 70px;
+      width: auto;
+      display: block;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 2rem;
+    }
+
+    .intro {
+      background: white;
+      padding: 18px 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .legend {
+      margin-top: 10px;
+      font-size: 0.95rem;
+      color: #555;
+    }
+
+    .question {
+      background: white;
+      padding: 18px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .question-number {
+      font-weight: bold;
+      margin-right: 8px;
+    }
+
+    .question-text {
+      font-size: 1rem;
+      line-height: 1.45;
+    }
+
+    .scale {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .scale label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #fafafa;
+      border: 1px solid #ddd;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      min-width: 58px;
+      justify-content: center;
+    }
+
+    .actions {
+      margin-top: 24px;
+      margin-bottom: 28px;
+    }
+
+    button {
+      background: #111;
+      color: white;
+      border: none;
+      padding: 14px 22px;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.92;
+    }
+
+    .results {
+      display: none;
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.07);
+      margin-top: 20px;
+    }
+
+    .results h2 {
+      margin-top: 0;
+      margin-bottom: 18px;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .result-card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 16px;
+      background: #fafafa;
+    }
+
+    .result-card h3 {
+      margin: 0 0 10px 0;
+      font-size: 1rem;
+    }
+
+    .score {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .highlight {
+      border: 2px solid #d90429;
+      background: #fff4f5;
+    }
+
+    .highlight .score,
+    .highlight h3 {
+      color: #d90429;
+    }
+
+    .note {
+      margin-bottom: 28px;
+      color: #444;
+      line-height: 1.5;
+    }
+
+    .chart-wrapper {
+      max-width: 700px;
+      margin: 0 auto;
+      padding-top: 10px;
+    }
+
+    canvas {
+      background: white;
+    }
+
+    @media (max-width: 700px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+
+      .scale {
+        gap: 8px;
+      }
+
+      .scale label {
+        min-width: 50px;
+        padding: 7px 9px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header>
+      <img
+        src="commax-logo.png"
+        alt="Commax Logo"
+        class="logo"
+      />
+      <div>
+        <h1>Stress Program Assessment</h1>
+      </div>
+    </header>
+
+    <div class="intro">
+      <div>
+        When dealing with stress, it is crucial to be aware of your own stress patterns, which are triggered by certain stimuli.
+        Assess whether each statement applies to you.
+      </div>
+      <div class="legend">
+        <strong>Scale:</strong> 1 = not at all; 2 = hardly at all; 3 = partly/partly true; 4 = often true; 5 = very true
+      </div>
+    </div>
+
+    <div id="questions"></div>
+
+    <div class="actions">
+      <button type="button" onclick="evaluateTest()">Evaluate</button>
+    </div>
+
+    <div id="results" class="results">
+      <h2>Evaluation</h2>
+      <div class="note">
+        Stress programs that exceed a value of <strong>40</strong> are highly likely to prevail, especially in stressful situations.
+      </div>
+      <div id="resultGrid" class="result-grid"></div>
+
+      <h2>Spider Chart</h2>
+      <div class="chart-wrapper">
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const questions = [
+      "I always do my work thoroughly.",
+      "It is my responsibility to make sure that the people I deal with feel comfortable.",
+      "I am constantly on the go.",
+      "I appear strong to others and do not show them my weaknesses.",
+      "My motto is: 'A rolling stone gathers no moss.'",
+      "I often use the phrase 'You can't say that for sure.'",
+      "I often say more than is actually necessary.",
+      "I find it difficult to accept people who are not exactly like me.",
+      "I find it difficult to show my feelings.",
+      "'Don't give up' is my motto.",
+      "When I express my opinion, I also justify it.",
+      "When I have a wish, I make it come true quickly.",
+      "Before I submit a report, I revise it several times.",
+      "People who 'dawdle' annoy me. Dawdling is a waste of time.",
+      "Being accepted by others is important to me.",
+      "I have a hard shell rather than a soft core. You have to be tough at work.",
+      "I often try to figure out what others expect of me.",
+      "I find it difficult to understand people who live carefree lives.",
+      "I often interrupt during discussions.",
+      "I solve my own problems.",
+      "I have a hard shell rather than a soft core. You have to be tough at work.",
+      "I often try to figure out what others expect of me.",
+      "I find it difficult to understand people who live carefree lives.",
+      "I often interrupt during discussions.",
+      "I solve my own problems.",
+      "I have a hard shell rather than a soft core. You have to be tough at work.",
+      "I often try to figure out what others expect of me.",
+      "I find it difficult to understand people who live carefree lives.",
+      "Once I start a task, I see it through to the end.",
+      "I put my needs and desires aside in favor of others.",
+      "I am often harsh toward others so that they will not hurt me.",
+      "I often drum my fingers impatiently on the table.",
+      "When explaining facts, I like to use clear enumeration: 1., 2., 3.,",
+      "I am convinced that most things are not as simple as many people claim.",
+      "I don't like criticizing others.",
+      "I often nod my head during discussions.",
+      "I always strive to achieve my goals.",
+      "My facial expression tends to be serious.",
+      "I am nervous.",
+      "Nothing can shake me easily.",
+      "My problems are nobody else's business.",
+      "I often say, 'Get a move on.'",
+      "I often say: 'Exactly,' 'Precisely,' 'Sure,' 'Logical.'",
+      "I often say: 'I don't understand that...'",
+      "I tend to say 'Could you try it?' rather than 'Try it.'",
+      "I am diplomatic.",
+      "I always try to exceed the expectations placed on me.",
+      "When I'm on the phone, I also work on emails at the same time.",
+      "My motto is: 'Grit your teeth.'",
+      "Despite enormous effort, there are many things I simply cannot achieve."
+    ];
+
+    const programs = {
+      "Perfection program": [1, 8, 11, 13, 23, 24, 33, 38, 43, 47],
+      "Effort program": [5, 6, 10, 18, 25, 29, 34, 37, 44, 50],
+      "Rush program": [3, 12, 14, 19, 21, 27, 32, 39, 42, 48],
+      "Harmony program": [2, 7, 15, 17, 28, 30, 35, 36, 45, 46],
+      "Toughness program": [4, 9, 16, 20, 22, 26, 31, 40, 41, 49]
+    };
+
+    const questionsContainer = document.getElementById("questions");
+    let radarChartInstance = null;
+
+    function renderQuestions() {
+      questions.forEach((question, index) => {
+        const questionNumber = index + 1;
+
+        const wrapper = document.createElement("div");
+        wrapper.className = "question";
+
+        const scaleOptions = [1, 2, 3, 4, 5]
+          .map(value => `
+            <label>
+              <input type="radio" name="q${questionNumber}" value="${value}">
+              ${value}
+            </label>
+          `)
+          .join("");
+
+        wrapper.innerHTML = `
+          <div class="question-text">
+            <span class="question-number">${questionNumber}.</span>${question}
+          </div>
+          <div class="scale">${scaleOptions}</div>
+        `;
+
+        questionsContainer.appendChild(wrapper);
+      });
+    }
+
+    function evaluateTest() {
+      const answers = {};
+
+      for (let i = 1; i <= 50; i++) {
+        const selected = document.querySelector(`input[name="q${i}"]:checked`);
+        if (!selected) {
+          alert("Please answer all 50 questions before evaluating.");
+          return;
+        }
+        answers[i] = Number(selected.value);
+      }
+
+      const scores = {};
+      for (const [programName, questionNumbers] of Object.entries(programs)) {
+        scores[programName] = questionNumbers.reduce((sum, qNum) => sum + answers[qNum], 0);
+      }
+
+      renderResults(scores);
+      renderRadarChart(scores);
+
+      const resultsSection = document.getElementById("results");
+      resultsSection.style.display = "block";
+      resultsSection.scrollIntoView({ behavior: "smooth" });
+    }
+
+    function renderResults(scores) {
+      const resultGrid = document.getElementById("resultGrid");
+      resultGrid.innerHTML = "";
+
+      Object.entries(scores).forEach(([programName, score]) => {
+        const card = document.createElement("div");
+        card.className = "result-card" + (score > 40 ? " highlight" : "");
+
+        card.innerHTML = `
+          <h3>${programName}</h3>
+          <div class="score">${score} / 50</div>
+          <div>${score > 40 ? "Dominant under stress" : "Below dominant threshold"}</div>
+        `;
+
+        resultGrid.appendChild(card);
+      });
+    }
+
+    function renderRadarChart(scores) {
+      const ctx = document.getElementById("radarChart").getContext("2d");
+
+      if (radarChartInstance) {
+        radarChartInstance.destroy();
+      }
+
+      radarChartInstance = new Chart(ctx, {
+        type: "radar",
+        data: {
+          labels: Object.keys(scores),
+          datasets: [{
+            label: "Stress Program Score",
+            data: Object.values(scores),
+            fill: true,
+            backgroundColor: "rgba(217, 4, 41, 0.20)",
+            borderColor: "rgba(217, 4, 41, 1)",
+            pointBackgroundColor: "rgba(217, 4, 41, 1)",
+            pointBorderColor: "#fff",
+            pointHoverBackgroundColor: "#fff",
+            pointHoverBorderColor: "rgba(217, 4, 41, 1)",
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          scales: {
+            r: {
+              min: 0,
+              max: 50,
+              ticks: {
+                stepSize: 10,
+                backdropColor: "transparent"
+              },
+              pointLabels: {
+                font: {
+                  size: 13
+                }
+              },
+              grid: {
+                circular: false
+              }
+            }
+          },
+          plugins: {
+            legend: {
+              display: true
+            },
+            tooltip: {
+              callbacks: {
+                label: function(context) {
+                  return `${context.label}: ${context.raw} / 50`;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    renderQuestions();
+  </script>
+</body>
+</html>
