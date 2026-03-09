@@ -60,10 +60,18 @@ class StressProgramAssessment {
       "Harmony program": [2, 7, 15, 17, 28, 30, 35, 36, 45, 46],
       "Toughness program": [4, 9, 16, 20, 22, 26, 31, 40, 41, 49]
     };
+    this.programVisualAssets = {
+      "Perfection program": "program-perfection.png",
+      "Effort program": "program-effort.png",
+      "Rush program": "program-rush.png",
+      "Harmony program": "program-harmony.png",
+      "Toughness program": "program-toughness.png"
+    };
 
     this.questionsContainer = document.getElementById("questions");
     this.resultGrid = document.getElementById("resultGrid");
     this.resultsElement = document.getElementById("results");
+    this.programVisualsElement = document.getElementById("programVisuals");
     this.evaluateButton = document.getElementById("evaluateBtn");
     this.radarChartCanvas = document.getElementById("radarChart");
     this.radarChartInstance = null;
@@ -123,6 +131,7 @@ class StressProgramAssessment {
 
     this.renderResults(scores);
     this.renderRadarChart(scores);
+    this.renderProgramVisuals(scores);
 
     this.resultsElement.style.display = "block";
     this.resultsElement.scrollIntoView({ behavior: "smooth" });
@@ -201,6 +210,48 @@ class StressProgramAssessment {
           }
         }
       }
+    });
+  }
+
+  renderProgramVisuals(scores) {
+    if (!this.programVisualsElement) {
+      return;
+    }
+
+    this.programVisualsElement.innerHTML = "";
+
+    Object.entries(scores).forEach(([programName, score]) => {
+      const card = document.createElement("figure");
+      card.className = "program-visual-card";
+
+      const imageName = this.programVisualAssets[programName] || "";
+      const statusText = score > 40 ? "Dominant" : "Observed";
+
+      const image = document.createElement("img");
+      image.className = "program-visual-image";
+      image.src = imageName;
+      image.alt = `${programName} visual`;
+      image.loading = "lazy";
+
+      image.addEventListener("error", () => {
+        image.remove();
+        const placeholder = document.createElement("div");
+        placeholder.className = "program-visual-placeholder";
+        placeholder.textContent = `Missing image: ${imageName}`;
+        card.prepend(placeholder);
+      });
+
+      const caption = document.createElement("figcaption");
+      caption.className = "program-visual-caption";
+      caption.innerHTML = `
+        <span class="program-visual-name">${programName}</span>
+        <span class="program-visual-score">${score} / 50 · ${statusText}</span>
+      `;
+
+      card.appendChild(image);
+      card.appendChild(caption);
+
+      this.programVisualsElement.appendChild(card);
     });
   }
 }
